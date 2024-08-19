@@ -1,0 +1,31 @@
+command /givefreeze:
+    permission: skript.freeze.give
+    trigger:
+        give player ice named "&bFreeze"
+        send "&aYou have received the &bFreeze &aice block."
+
+on rightclick with ice:
+    if name of player's tool is "&bFreeze":
+        if clicked entity is a player:
+            set {_target} to clicked entity
+            if {frozen::%{_target}%} is set:
+                # Unfreeze the player
+                delete {frozen::%{_target}%}
+                delete {frozen-loc::%{_target}%}
+                # Restore the target player's game mode to survival
+                set {_target}'s game mode to survival
+                send "&a%{_target}% has been unfrozen." to player
+                send "&aYou have been unfrozen." to {_target}
+            else:
+                # Freeze the player
+                set {frozen::%{_target}%} to true
+                set {frozen-loc::%{_target}%} to location of {_target}
+                # Set the target player to adventure mode
+                set {_target}'s game mode to adventure
+                send title "&cYOU HAVE BEEN FROZEN" with subtitle "&4IF YOU LEAVE YOU WILL GET BANNED" to {_target} for 10 seconds
+                send "&bYou have frozen %{_target}%" to player
+
+every 1 second:
+    loop all players:
+        if {frozen::%loop-player%} is true:
+            teleport loop-player to {frozen-loc::%loop-player%}
